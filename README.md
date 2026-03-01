@@ -1,16 +1,40 @@
-# React + Vite
+# DLC Dashboard (React + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Pequeno projeto React usando Vite que exibe dados de DLCs do Train Simulator.
 
-Currently, two official plugins are available:
+Quick start
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Instalar dependências:
 
-## React Compiler
+```bash
+npm install
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Rodar em desenvolvimento:
 
-## Expanding the ESLint configuration
+```bash
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Build para produção:
+
+```bash
+npm run build
+```
+
+- Pré-deploy / deploy para `gh-pages` (já configurado no `package.json`):
+
+```bash
+npm run predeploy
+npm run deploy
+```
+
+Notas
+
+- O `homepage` em `package.json` e `base` em `vite.config.js` estão definidos para `/dlc-dashboard/` — mantenha esse valor se for publicar no GitHub Pages sob `https://<usuario>.github.io/dlc-dashboard`.
+- O arquivo `public/dlcs_train_simulator.csv` está no repositório; se crescer muito (>100MB) considere usar Git LFS ou hospedar externamente.
+
+Extras que você pode querer adicionar
+
+- `LICENSE` se desejar publicar com uma licença (ex.: MIT).
+- Personalizar este `README.md` com descrição do projeto e screenshots.

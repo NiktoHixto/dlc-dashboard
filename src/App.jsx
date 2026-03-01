@@ -7,13 +7,17 @@ export default function DLCDashboard() {
   const [search, setSearch] = useState("");
   const [total, setTotal] = useState(0);
   const [average, setAverage] = useState(0);
+  const [loadError, setLoadError] = useState(null);
   const [sortType, setSortType] = useState("none");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
 
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}dlcs_train_simulator.csv`)
-      .then((res) => res.text())
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status} fetching CSV at ${res.url}`);
+        return res.text();
+      })
       .then((text) => {
         const result = Papa.parse(text, {
           header: true,
@@ -41,6 +45,11 @@ export default function DLCDashboard() {
         setData(parsed);
         setTotal(totalPrice);
         setAverage(avg);
+      })
+      .catch((err) => {
+        console.error("Erro ao carregar CSV:", err);
+        setLoadError(String(err));
+        setData([]);
       });
   }, []);
 
@@ -162,6 +171,11 @@ export default function DLCDashboard() {
       </div>
 
       {/* Contador */}
+      {loadError && (
+        <div style={{ marginBottom: "12px", color: "#fca5a5" }}>
+          Erro ao carregar CSV: {loadError}. Verifique o caminho do arquivo e o deploy.
+        </div>
+      )}
       <div style={{ marginBottom: "20px", fontSize: "14px", opacity: 0.8 }}>
         Mostrando <strong>{filtered.length}</strong> de <strong>{data.length}</strong> DLCs
       </div>
