@@ -13,16 +13,13 @@ export default function DLCDashboard() {
   const [maxPrice, setMaxPrice] = useState("");
 
   useEffect(() => {
-    fetch(`${import.meta.env.BASE_URL}dlcs_train_simulator.csv`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status} fetching CSV at ${res.url}`);
-        return res.text();
-      })
-      .then((text) => {
-        const result = Papa.parse(text, {
-          header: true,
-          skipEmptyLines: true,
-        });
+    (async () => {
+      const primaryUrl = `${import.meta.env.BASE_URL}dlcs_train_simulator.csv`;
+      const fallbackUrl = "./dlcs_train_simulator.csv";
+      const urlsToTry = [primaryUrl, fallbackUrl];
+
+      const parseAndSet = (text) => {
+        const result = Papa.parse(text, { header: true, skipEmptyLines: true });
 
         const parsed = result.data
           .map((row) => {
@@ -45,12 +42,32 @@ export default function DLCDashboard() {
         setData(parsed);
         setTotal(totalPrice);
         setAverage(avg);
-      })
-      .catch((err) => {
-        console.error("Erro ao carregar CSV:", err);
-        setLoadError(String(err));
-        setData([]);
-      });
+      };
+
+      let lastError = null;
+      for (const url of urlsToTry) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) {
+            lastError = new Error(`HTTP ${res.status} fetching CSV at ${res.url}`);
+            console.warn(`CSV fetch failed for ${url}:`, lastError.message);
+            continue;
+          }
+          const text = await res.text();
+          console.info(`CSV loaded from ${url}`);
+          setLoadError(null);
+          parseAndSet(text);
+          return;
+        } catch (err) {
+          console.warn(`Error fetching CSV from ${url}:`, err);
+          lastError = err;
+        }
+      }
+
+      console.error("All CSV fetch attempts failed", lastError);
+      setLoadError(String(lastError));
+      setData([]);
+    })();
   }, []);
 
   let filtered = data.filter((item) =>
