@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Papa from "papaparse";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import csvUrl from "./assets/dlcs_train_simulator.csv?url";
 
 export default function DLCDashboard() {
   const [data, setData] = useState([]);
@@ -14,22 +15,6 @@ export default function DLCDashboard() {
 
   useEffect(() => {
     (async () => {
-      const resolvedBase = (import.meta.env.BASE_URL && import.meta.env.BASE_URL !== "/") ? import.meta.env.BASE_URL : "/dlc-dashboard/";
-      const primaryUrl = `${resolvedBase}dlcs_train_simulator.csv`;
-      const fallbackUrl = "./dlcs_train_simulator.csv";
-      const pathnameBase = (() => {
-        try {
-          const p = window.location.pathname || "/";
-          if (p.endsWith("/")) return p;
-          return p.substring(0, p.lastIndexOf("/") + 1) || "/";
-        } catch (e) {
-          return "/";
-        }
-      })();
-
-      const triedFull = `${window.location.origin}${pathnameBase}dlcs_train_simulator.csv`;
-      const urlsToTry = [primaryUrl, triedFull, fallbackUrl, "https://NiktoHixto.github.io/dlc-dashboard/dlcs_train_simulator.csv"];
-
       const parseAndSet = (text) => {
         const result = Papa.parse(text, { header: true, skipEmptyLines: true });
 
@@ -56,29 +41,19 @@ export default function DLCDashboard() {
         setAverage(avg);
       };
 
-      let lastError = null;
-      for (const url of urlsToTry) {
-        try {
-          const res = await fetch(url);
-          if (!res.ok) {
-            lastError = new Error(`HTTP ${res.status} fetching CSV at ${res.url}`);
-            console.warn(`CSV fetch failed for ${url}:`, lastError.message);
-            continue;
-          }
-          const text = await res.text();
-          console.info(`CSV loaded from ${url}`);
-          setLoadError(null);
-          parseAndSet(text);
-          return;
-        } catch (err) {
-          console.warn(`Error fetching CSV from ${url}:`, err);
-          lastError = err;
-        }
+      try {
+        console.info(`CSV loading from ${csvUrl}`);
+        const res = await fetch(csvUrl);
+        if (!res.ok) throw new Error(`HTTP ${res.status} fetching CSV`);
+        const text = await res.text();
+        console.info("CSV loaded successfully");
+        setLoadError(null);
+        parseAndSet(text);
+      } catch (err) {
+        console.error("Error loading CSV:", err);
+        setLoadError(String(err));
+        setData([]);
       }
-
-      console.error("All CSV fetch attempts failed", lastError);
-      setLoadError(String(lastError));
-      setData([]);
     })();
   }, []);
 
