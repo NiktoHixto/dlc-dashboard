@@ -16,7 +16,19 @@ export default function DLCDashboard() {
     (async () => {
       const primaryUrl = `${import.meta.env.BASE_URL}dlcs_train_simulator.csv`;
       const fallbackUrl = "./dlcs_train_simulator.csv";
-      const urlsToTry = [primaryUrl, fallbackUrl];
+      const pathnameBase = (() => {
+        try {
+          const p = window.location.pathname || "/";
+          // remove trailing filename or trailing slash
+          if (p.endsWith("/")) return p;
+          return p.substring(0, p.lastIndexOf("/") + 1) || "/";
+        } catch (e) {
+          return "/";
+        }
+      })();
+
+      const triedFull = `${window.location.origin}${pathnameBase}dlcs_train_simulator.csv`;
+      const urlsToTry = [primaryUrl, triedFull, fallbackUrl, "https://NiktoHixto.github.io/dlc-dashboard/dlcs_train_simulator.csv"];
 
       const parseAndSet = (text) => {
         const result = Papa.parse(text, { header: true, skipEmptyLines: true });
@@ -171,8 +183,8 @@ export default function DLCDashboard() {
       </div>
 
       {/* Gráfico */}
-      <div style={{ width: "100%", height: 350, background: "#1e293b", padding: "20px", borderRadius: "16px", marginBottom: "40px" }}>
-        <ResponsiveContainer>
+      <div style={{ width: "100%", height: 350, minWidth: 0, minHeight: 0, background: "#1e293b", padding: "20px", borderRadius: "16px", marginBottom: "40px" }}>
+        <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData}>
             <XAxis dataKey="nome" hide />
             <YAxis stroke="#94a3b8" />
