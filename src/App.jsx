@@ -14,12 +14,12 @@ export default function DLCDashboard() {
 
   useEffect(() => {
     (async () => {
-      const primaryUrl = `${import.meta.env.BASE_URL}dlcs_train_simulator.csv`;
+      const resolvedBase = (import.meta.env.BASE_URL && import.meta.env.BASE_URL !== "/") ? import.meta.env.BASE_URL : "/dlc-dashboard/";
+      const primaryUrl = `${resolvedBase}dlcs_train_simulator.csv`;
       const fallbackUrl = "./dlcs_train_simulator.csv";
       const pathnameBase = (() => {
         try {
           const p = window.location.pathname || "/";
-          // remove trailing filename or trailing slash
           if (p.endsWith("/")) return p;
           return p.substring(0, p.lastIndexOf("/") + 1) || "/";
         } catch (e) {
