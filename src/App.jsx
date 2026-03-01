@@ -12,7 +12,7 @@ export default function DLCDashboard() {
   const [maxPrice, setMaxPrice] = useState("");
 
   useEffect(() => {
-    fetch("/dlcs_train_simulator.csv")
+    fetch(`${import.meta.env.BASE_URL}dlcs_train_simulator.csv`)
       .then((res) => res.text())
       .then((text) => {
         const result = Papa.parse(text, {
